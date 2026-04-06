@@ -1,20 +1,21 @@
 import axios from 'axios';
 import type { Movie } from '../types/movie';
 
-interface GetMoviesRes {
+interface MoviesResponse {
   results: Movie[];
+  total_pages: number;
 }
 
-export const getMovies = async (movieQuery: string): Promise<Movie[]> => {
-  const url = 'https://api.themoviedb.org/3/search/movie';
-  const setting = {
+export async function fetchMovies(query: string, page: number): Promise<MoviesResponse> {
+  const response = await axios.get<MoviesResponse>('https://api.themoviedb.org/3/search/movie', {
     params: {
-      query: movieQuery,
+      query,
+      page,
     },
     headers: {
       Authorization: `Bearer ${import.meta.env.VITE_MY_API}`,
     },
-  };
-  const response = await axios.get<GetMoviesRes>(url, setting);
-  return response.data.results;
-};
+  });
+
+  return response.data;
+}
